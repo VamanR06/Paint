@@ -1,5 +1,5 @@
 from PyQt6 import QtGui
-from PyQt6.QtWidgets import QLabel, QToolBar, QStatusBar, QMainWindow, QSizePolicy, QFileDialog
+from PyQt6.QtWidgets import QLabel, QToolBar, QStatusBar, QMainWindow, QSizePolicy, QFileDialog, QWidget, QMessageBox
 from PyQt6.QtCore import Qt
 from ..toolbar import Main_ToolBar, Utils_ToolBar, Color_ToolBar
 
@@ -7,6 +7,9 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         
+        self.setWindowTitle("Paint")
+        self.setWindowIcon(QtGui.QIcon("C:/GitHub/Paint/assets/icon.png"))
+
         self.addToolBar(Main_ToolBar(self))
         self.addToolBarBreak(Qt.ToolBarArea.TopToolBarArea)
         self.addToolBar(Utils_ToolBar(self))
@@ -15,17 +18,14 @@ class MainWindow(QMainWindow):
 
         self.canvas = Canvas(self)
         self.setCentralWidget(self.canvas)
-
-        self.image = QtGui.QImage(self.canvas.width(), self.canvas.height(), QtGui.QImage.Format.Format_RGB32)
     
-        self.setStatusBar(QStatusBar(self))
-
         self.active = {"item": None, "type": None, "color": Qt.GlobalColor.black, "size": 10}
 
         self.last_x, self.last_y = None, None
 
         self.history = []
-        self.saved = False
+        self.saved = True
+        self.filePath = False
 
     def setColor(self, color):
         self.active["color"] = QtGui.QColor(color)
@@ -40,62 +40,105 @@ class MainWindow(QMainWindow):
             self.active["size"].setWidth(size)
 
     def makeNewCanvas(self):
+        if not self.saved:
+            confirm = QMessageBox()
+            confirm.setText("Do you want to save your work?")
+            confirm.setIcon(QMessageBox.Icon.Warning)
+            confirm.addButton(QMessageBox.StandardButton.Yes)
+            confirm.addButton(QMessageBox.StandardButton.No)
+
+            confirm.exec()
+
+            if confirm.standardButton(confirm.clickedButton()) != QMessageBox.StandardButton.Yes:
+                return
+
         self.canvas = Canvas(self)
         self.setCentralWidget(self.canvas)
+        self.saved = True
 
-    def saveImage(self):
-        filePath = QFileDialog.getSaveFileName(self, "Save Image", "", "PNG(*.png);;JPEG(*.jpg *.jpeg);;All Files(*.*)")
+    def saveAsImage(self):
+        filePath, _ = QFileDialog.getSaveFileName(self, "Save Image", "", "PNG(*.png);;JPEG(*.jpg *.jpeg);;All Files(*.*)")
 
-        if not filePath:
+        if filePath == "":
             return
                 
-        self.image.save(filePath[0])
+        self.canvas.image.save(filePath)
+        self.filePath = filePath
 
-    # def resizeEvent(self, event: QtGui.QResizeEvent):
-    #     canvas = self.label.pixmap()
-    #     canvas = canvas.scaled(self.width(), self.height())
-    #     self.label.setPixmap(canvas)
+        self.saved = True
 
-class Canvas(QLabel):
+    def saveImage(self):
+        if not self.filePath:
+            self.saveAsImage()
+            return
+
+        self.canvas.image.save(self.filePath)
+
+        self.saved = True
+
+    def openImage(self):
+        if not self.saved:
+            confirm = QMessageBox()
+            confirm.setText("Do you want to save your work?")
+            confirm.setIcon(QMessageBox.Icon.Warning)
+            confirm.addButton(QMessageBox.StandardButton.Yes)
+            confirm.addButton(QMessageBox.StandardButton.No)
+
+            confirm.exec()
+
+            if confirm.standardButton(confirm.clickedButton()) != QMessageBox.StandardButton.Yes:
+                return
+
+        filePath, _ = QFileDialog.getOpenFileName(self, "Open Image", "", "PNG(*.png);;JPEG(*.jpg *.jpeg);;All Files(*.*)")
+
+        if filePath == "":
+            return
+        
+        with open(filePath, "rb") as f:
+            data = f.read()
+
+        self.canvas.image.loadFromData(data)
+        # self.canvas.image = self.canvas.image.scaled(self.)
+
+        self.filePath = filePath
+
+        self.saved = True
+
+class Canvas(QWidget):
     def __init__(self, parent: MainWindow):
         super().__init__(parent)
-        canvas = QtGui.QPixmap(800, 800)
-        canvas.fill(Qt.GlobalColor.white)
-        self.setPixmap(canvas)
 
-        # self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
-        self.setAlignment(Qt.AlignmentFlag.AlignAbsolute)
-        # self.setMinimumSize(10,10)
+        self.image = QtGui.QImage(self.width(), self.height(), QtGui.QImage.Format.Format_RGB32)
+        self.image.fill(Qt.GlobalColor.white)
+
+        self.setMinimumSize(400, 400)
 
         self.last_x, self.last_y = None, None
 
     def drawPoint(self, x, y):
-        canvas = self.pixmap()
-        painter = QtGui.QPainter(canvas)
+        painter = QtGui.QPainter(self.image)
         pen = self.parent().active["item"]
         painter.setPen(pen)
         painter.drawPoint(x, y)
-        painter.end()
-        self.setPixmap(canvas)
+
+        self.update()
 
     def drawLine(self, x, y):
-        canvas = self.pixmap()
-        painter = QtGui.QPainter(canvas)
+        painter = QtGui.QPainter(self.image)
         pen = self.parent().active["item"]
         painter.setPen(pen)
         painter.drawLine(self.last_x, self.last_y, x, y)
-        painter.end()
-        self.setPixmap(canvas)
 
         self.last_x, self.last_y = x, y
 
+        self.update()
+
     def fill(self, x, y):
-        canvas = self.pixmap()
-        painter = QtGui.QPainter(canvas)
+        painter = QtGui.QPainter(self.image)
         pen = self.parent().active["item"]
         painter.setPen(pen)
         
-        image = canvas.toImage()
+        image = self.image
         color = image.pixel(x, y)
 
         queue = [(x, y)]
@@ -115,9 +158,8 @@ class Canvas(QLabel):
                         visited.add((xx, yy))
 
                 queue = points + queue
-
-        painter.end()
-        self.setPixmap(canvas)
+        
+        self.update()
 
     def mousePressEvent(self, event: QtGui.QMouseEvent):
         if self.parent().active["type"]:
@@ -127,6 +169,8 @@ class Canvas(QLabel):
             elif self.parent().active["type"] in ("fill_bucket"):
                 self.fill(event.pos().x(), event.pos().y())
 
+            self.parent().saved = False
+
     def mouseMoveEvent(self, event: QtGui.QMouseEvent):
         if self.parent().active["type"]:
             if self.parent().active["type"] in ("pen", "eraser"):
@@ -135,11 +179,17 @@ class Canvas(QLabel):
                     return
 
                 self.drawLine(event.pos().x(), event.pos().y())
+            
+            self.parent().saved = False
 
     def mouseReleaseEvent(self, event: QtGui.QMouseEvent):
         self.last_x, self.last_y = None, None
 
-    # def resizeEvent(self, event: QtGui.QResizeEvent):
-    #     canvas = self.pixmap()
-    #     canvas = canvas.scaled(self.width(), self.height(), Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
-    #     self.setPixmap(canvas)
+    def paintEvent(self, event):
+        canvasPainter = QtGui.QPainter(self)
+        canvasPainter.drawImage(self.rect(), self.image, self.image.rect())
+
+    def resizeEvent(self, event):
+        self.image = self.image.scaled(self.width(), self.height())
+
+# MAKE A SERVER TO UPLOAD PICTURES TOO

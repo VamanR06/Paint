@@ -1,4 +1,4 @@
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QKeySequence
 from PyQt6.QtWidgets import QMenu, QToolButton
 
 class File(QToolButton):
@@ -26,6 +26,8 @@ class New(QAction):
 
         self.triggered.connect(self.on_trigger)
 
+        self.setShortcut(QKeySequence("Ctrl+n"))
+
     def on_trigger(self):
         self.parent().parent().parent().makeNewCanvas()
 
@@ -33,9 +35,23 @@ class Open(QAction):
     def __init__(self, parent):
         super().__init__("Open", parent)
 
+        self.triggered.connect(self.on_trigger)
+
+        self.setShortcut(QKeySequence("Ctrl+o"))
+
+    def on_trigger(self):
+        self.parent().parent().parent().openImage()
+
 class Save(QAction):
     def __init__(self, parent):
         super().__init__("Save", parent)
+
+        self.triggered.connect(self.on_trigger)
+
+        self.setShortcut(QKeySequence("Ctrl+s"))
+
+    def on_trigger(self):
+        self.parent().parent().parent().saveImage()
 
 class SaveAs(QAction):
     def __init__(self, parent):
@@ -43,5 +59,7 @@ class SaveAs(QAction):
 
         self.triggered.connect(self.on_trigger)
 
+        self.setShortcut(QKeySequence("Ctrl+Shift+s"))
+
     def on_trigger(self):
-        self.parent().parent().parent().saveImage()
+        self.parent().parent().parent().saveAsImage()

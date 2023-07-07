@@ -1,5 +1,5 @@
 from PyQt6 import QtGui
-from PyQt6.QtWidgets import QToolBar, QStatusBar, QPushButton
+from PyQt6.QtWidgets import QToolBar, QStatusBar, QPushButton, QColorDialog
 from PyQt6.QtCore import Qt
 
 COLORS = [
@@ -17,6 +17,21 @@ class Color_ToolBar(QToolBar):
         for i in COLORS:
             button = PaletteButton(i, self)
             self.addWidget(button)
+
+        self.custom_color = QPushButton()
+        self.setStyleSheet("background-color: #FFFFFF")
+
+        self.custom_color.clicked.connect(self.openColorPicker)
+
+        self.addWidget(self.custom_color)
+
+    def openColorPicker(self):
+        color = QColorDialog.getColor()
+
+        if color.isValid():
+            self.parent().setColor(color)
+            red, green, blue = color.toRgb().red(), color.toRgb().green(), color.toRgb().blue()
+            self.custom_color.setStyleSheet(f"background-color: rgb({red}, {green}, {blue})")
 
 class PaletteButton(QPushButton):
     def __init__(self, color, parent):

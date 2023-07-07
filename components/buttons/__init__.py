@@ -1,5 +1,6 @@
 from .exit import Exit
 from .file import File
+from .edit import Edit
 
 from .pen import Pen
 from .eraser import Eraser

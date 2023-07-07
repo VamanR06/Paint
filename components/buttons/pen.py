@@ -19,3 +19,5 @@ class Pen(QToolButton):
         self.setChecked(True)
         self.parent().parent().active["type"] = "pen"
         self.parent().parent().active["item"] = QtGui.QPen(self.parent().parent().active["color"] if self.parent().parent().active["color"] else Qt.GlobalColor.black, self.parent().parent().active["size"])
+    
+        self.parent().parent().setCustomCursor(QtGui.QCursor(QtGui.QPixmap("C:/GitHub/Paint/assets/pen.png")))

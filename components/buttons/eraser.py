@@ -19,3 +19,5 @@ class Eraser(QToolButton):
         self.setChecked(True)
         self.parent().parent().active["type"] = "eraser"
         self.parent().parent().active["item"] = QtGui.QPen(Qt.GlobalColor.white, self.parent().parent().active["size"])
+
+        self.parent().parent().setCustomCursor(QtGui.QCursor(QtGui.QPixmap("C:/GitHub/Paint/assets/eraser.png")))

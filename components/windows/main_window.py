@@ -134,6 +134,9 @@ class MainWindow(QMainWindow):
             
         event.accept()
 
+    def setCustomCursor(self, cursor):
+        self.setCursor(cursor)
+
 class Canvas(QWidget):
     def __init__(self, parent: MainWindow):
         super().__init__(parent)

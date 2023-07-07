@@ -17,10 +17,14 @@ class Exit(QAction):
             confirm.setIcon(QMessageBox.Icon.Warning)
             confirm.addButton(QMessageBox.StandardButton.Yes)
             confirm.addButton(QMessageBox.StandardButton.No)
+            confirm.addButton(QMessageBox.StandardButton.Cancel)
 
             confirm.exec()
 
-            if confirm.standardButton(confirm.clickedButton()) != QMessageBox.StandardButton.Yes:
-                return
+            if confirm.standardButton(confirm.clickedButton()) == QMessageBox.StandardButton.Yes:
+                self.parent().parent().saveImage()
 
+            elif confirm.standardButton(confirm.clickedButton()) != QMessageBox.StandardButton.No:
+                return
+            
         sys.exit()

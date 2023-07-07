@@ -46,15 +46,20 @@ class MainWindow(QMainWindow):
             confirm.setIcon(QMessageBox.Icon.Warning)
             confirm.addButton(QMessageBox.StandardButton.Yes)
             confirm.addButton(QMessageBox.StandardButton.No)
+            confirm.addButton(QMessageBox.StandardButton.Cancel)
 
             confirm.exec()
 
-            if confirm.standardButton(confirm.clickedButton()) != QMessageBox.StandardButton.Yes:
+            if confirm.standardButton(confirm.clickedButton()) == QMessageBox.StandardButton.Yes:
+                self.saveImage()
+
+            elif confirm.standardButton(confirm.clickedButton()) != QMessageBox.StandardButton.No:
                 return
 
         self.canvas = Canvas(self)
         self.setCentralWidget(self.canvas)
         self.saved = True
+        self.filePath = False
 
     def saveAsImage(self):
         filePath, _ = QFileDialog.getSaveFileName(self, "Save Image", "", "PNG(*.png);;JPEG(*.jpg *.jpeg);;All Files(*.*)")
@@ -83,10 +88,14 @@ class MainWindow(QMainWindow):
             confirm.setIcon(QMessageBox.Icon.Warning)
             confirm.addButton(QMessageBox.StandardButton.Yes)
             confirm.addButton(QMessageBox.StandardButton.No)
+            confirm.addButton(QMessageBox.StandardButton.Cancel)
 
             confirm.exec()
 
-            if confirm.standardButton(confirm.clickedButton()) != QMessageBox.StandardButton.Yes:
+            if confirm.standardButton(confirm.clickedButton()) == QMessageBox.StandardButton.Yes:
+                self.saveImage()
+            
+            elif confirm.standardButton(confirm.clickedButton()) != QMessageBox.StandardButton.No:
                 return
 
         filePath, _ = QFileDialog.getOpenFileName(self, "Open Image", "", "PNG(*.png);;JPEG(*.jpg *.jpeg);;All Files(*.*)")
@@ -98,11 +107,32 @@ class MainWindow(QMainWindow):
             data = f.read()
 
         self.canvas.image.loadFromData(data)
-        # self.canvas.image = self.canvas.image.scaled(self.)
+        self.canvas.image = self.canvas.image.scaled(self.canvas.width(), self.canvas.height(), Qt.AspectRatioMode.IgnoreAspectRatio)
+        self.canvas.update()
 
         self.filePath = filePath
 
         self.saved = True
+
+    def closeEvent(self, event: QtGui.QCloseEvent):
+        if not self.saved:
+            confirm = QMessageBox()
+            confirm.setText("Do you want to save your work?")
+            confirm.setIcon(QMessageBox.Icon.Warning)
+            confirm.addButton(QMessageBox.StandardButton.Yes)
+            confirm.addButton(QMessageBox.StandardButton.No)
+            confirm.addButton(QMessageBox.StandardButton.Cancel)
+
+            confirm.exec()
+
+            if confirm.standardButton(confirm.clickedButton()) == QMessageBox.StandardButton.Yes:
+                self.saveImage()
+
+            elif confirm.standardButton(confirm.clickedButton()) != QMessageBox.StandardButton.No:
+                event.ignore()
+                return
+            
+        event.accept()
 
 class Canvas(QWidget):
     def __init__(self, parent: MainWindow):

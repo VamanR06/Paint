@@ -23,7 +23,6 @@ class MainWindow(QMainWindow):
 
         self.last_x, self.last_y = None, None
 
-        self.history = []
         self.saved = True
         self.filePath = False
 
@@ -65,21 +64,24 @@ class MainWindow(QMainWindow):
         filePath, _ = QFileDialog.getSaveFileName(self, "Save Image", "", "PNG(*.png);;JPEG(*.jpg *.jpeg);;All Files(*.*)")
 
         if filePath == "":
-            return
+            return False
                 
         self.canvas.image.save(filePath)
         self.filePath = filePath
 
         self.saved = True
 
+        return True
+
     def saveImage(self):
         if not self.filePath:
-            self.saveAsImage()
-            return
+            return self.saveAsImage()
 
         self.canvas.image.save(self.filePath)
 
         self.saved = True
+
+        return True
 
     def openImage(self):
         if not self.saved:
@@ -93,7 +95,8 @@ class MainWindow(QMainWindow):
             confirm.exec()
 
             if confirm.standardButton(confirm.clickedButton()) == QMessageBox.StandardButton.Yes:
-                self.saveImage()
+                if not self.saveImage():
+                    return
             
             elif confirm.standardButton(confirm.clickedButton()) != QMessageBox.StandardButton.No:
                 return
@@ -113,6 +116,13 @@ class MainWindow(QMainWindow):
         self.filePath = filePath
 
         self.saved = True
+
+    def undo(self):
+        if len(self.canvas.history) <= 1 or self.canvas.cur_pos <= 1:
+            return
+        
+        self.canvas = Canvas(self, self.canvas.history[self.canvas.cur_pos-2], (self.canvas.last_x, self.canvas.last_y), self.canvas.history, self.canvas.cur_pos-1)
+        self.setCentralWidget(self.canvas)
 
     def closeEvent(self, event: QtGui.QCloseEvent):
         if not self.saved:
@@ -138,15 +148,24 @@ class MainWindow(QMainWindow):
         self.setCursor(cursor)
 
 class Canvas(QWidget):
-    def __init__(self, parent: MainWindow):
+    def __init__(self, parent: MainWindow, image: QtGui.QImage = None, last_pos: tuple = None, history: list = None, cur_pos: int = None):
         super().__init__(parent)
 
-        self.image = QtGui.QImage(self.width(), self.height(), QtGui.QImage.Format.Format_RGB32)
-        self.image.fill(Qt.GlobalColor.white)
-
         self.setMinimumSize(400, 400)
+        if not image:
+            self.image = QtGui.QImage(self.width(), self.height(), QtGui.QImage.Format.Format_RGB32)
+            self.image.fill(Qt.GlobalColor.white)
+            self.last_x, self.last_y = None, None
+            self.history = [self.image.copy()]
+            self.cur_pos = 1
 
-        self.last_x, self.last_y = None, None
+        else:
+            self.image = image
+            self.last_x, self.last_y = last_pos
+            self.history = history.copy()
+            self.cur_pos = cur_pos
+
+        print(self.cur_pos, self.image, self.history) # SAME IMAGE IS PUT IN THE LIST NOT DIFF
 
     def drawPoint(self, x, y):
         painter = QtGui.QPainter(self.image)
@@ -216,7 +235,20 @@ class Canvas(QWidget):
             self.parent().saved = False
 
     def mouseReleaseEvent(self, event: QtGui.QMouseEvent):
+        image = self.image.copy()
+        if not self.parent().active["type"]:
+            return
+
+        if self.cur_pos < len(self.history):
+            print("yes")
+            self.history = self.history[:self.cur_pos]
+
+        self.history.append(image)
+        self.cur_pos = len(self.history)
+        
         self.last_x, self.last_y = None, None
+
+        print(self.cur_pos, image, self.history)
 
     def paintEvent(self, event):
         canvasPainter = QtGui.QPainter(self)

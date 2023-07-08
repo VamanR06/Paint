@@ -172,8 +172,6 @@ class Canvas(QWidget):
             self.history = history.copy()
             self.cur_pos = cur_pos
 
-        print(self.cur_pos, self.image, self.history) # SAME IMAGE IS PUT IN THE LIST NOT DIFF
-
     def drawPoint(self, x, y):
         painter = QtGui.QPainter(self.image)
         pen = self.parent().active["item"]
@@ -247,7 +245,6 @@ class Canvas(QWidget):
             return
 
         if self.cur_pos < len(self.history):
-            print("yes")
             self.history = self.history[:self.cur_pos]
 
         self.history.append(image)
@@ -255,13 +252,9 @@ class Canvas(QWidget):
         
         self.last_x, self.last_y = None, None
 
-        print(self.cur_pos, image, self.history)
-
     def paintEvent(self, event):
         canvasPainter = QtGui.QPainter(self)
         canvasPainter.drawImage(self.rect(), self.image, self.image.rect())
 
     def resizeEvent(self, event):
         self.image = self.image.scaled(self.width(), self.height())
-
-# MAKE A SERVER TO UPLOAD PICTURES TOO

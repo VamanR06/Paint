@@ -124,6 +124,13 @@ class MainWindow(QMainWindow):
         self.canvas = Canvas(self, self.canvas.history[self.canvas.cur_pos-2], (self.canvas.last_x, self.canvas.last_y), self.canvas.history, self.canvas.cur_pos-1)
         self.setCentralWidget(self.canvas)
 
+    def redo(self):
+        if len(self.canvas.history) <= 1 or self.canvas.cur_pos == len(self.canvas.history):
+            return
+
+        self.canvas = Canvas(self, self.canvas.history[self.canvas.cur_pos], (self.canvas.last_x, self.canvas.last_y), self.canvas.history, self.canvas.cur_pos+1)
+        self.setCentralWidget(self.canvas)
+
     def closeEvent(self, event: QtGui.QCloseEvent):
         if not self.saved:
             confirm = QMessageBox()

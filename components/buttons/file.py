@@ -1,5 +1,6 @@
+import sys
 from PyQt6.QtGui import QAction, QKeySequence
-from PyQt6.QtWidgets import QMenu, QToolButton
+from PyQt6.QtWidgets import QMenu, QToolButton, QMessageBox
 
 class File(QToolButton):
     def __init__(self, parent):
@@ -12,6 +13,7 @@ class File(QToolButton):
         menu.addAction(Open(self))
         menu.addAction(Save(self))
         menu.addAction(SaveAs(self))
+        menu.addAction(Exit(self))
 
         self.setMenu(menu)
 
@@ -63,3 +65,31 @@ class SaveAs(QAction):
 
     def on_trigger(self):
         self.parent().parent().parent().saveAsImage()
+
+class Exit(QAction):
+    def __init__(self, parent):
+        super().__init__(text="Exit", parent=parent)
+
+        self.triggered.connect(self.on_trigger)
+
+        self.setShortcut(QKeySequence("Ctrl+q"))
+
+    def on_trigger(self):
+        if not self.parent().parent().parent().saved:
+            confirm = QMessageBox()
+            confirm.setText("Do you want to save your work?")
+            confirm.setIcon(QMessageBox.Icon.Warning)
+            confirm.addButton(QMessageBox.StandardButton.Yes)
+            confirm.addButton(QMessageBox.StandardButton.No)
+            confirm.addButton(QMessageBox.StandardButton.Cancel)
+
+            confirm.exec()
+
+            if confirm.standardButton(confirm.clickedButton()) == QMessageBox.StandardButton.Yes:
+                if not self.parent().parent().parent().saveImage():
+                    return
+
+            elif confirm.standardButton(confirm.clickedButton()) != QMessageBox.StandardButton.No:
+                return
+            
+        sys.exit()

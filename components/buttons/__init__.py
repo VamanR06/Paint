@@ -1,4 +1,3 @@
-from .exit import Exit
 from .file import File
 from .edit import Edit
 

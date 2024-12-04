@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QToolButton, QMenu, QPushButton, QVBoxLayout, QHBoxL
 
 class Eraser(QToolButton):
     def __init__(self, parent):
-        super().__init__(icon=QIcon("C:/GitHub/Paint/assets/eraser.png"), parent=parent)
+        super().__init__(icon=QIcon("./assets/eraser.png"), parent=parent)
 
         self.setStatusTip("Eraser")
         self.setCheckable(True)

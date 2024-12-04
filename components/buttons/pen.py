@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QToolButton, QMenu, QPushButton, QVBoxLayout, QHBoxL
 
 class Pen(QToolButton):
     def __init__(self, parent):
-        super().__init__(icon=QIcon("C:/GitHub/Paint/assets/pen.png"), parent=parent)
+        super().__init__(icon=QIcon("./assets/pen.png"), parent=parent)
 
         self.setStatusTip("Pen")
         self.setCheckable(True)
@@ -20,4 +20,4 @@ class Pen(QToolButton):
         self.parent().parent().active["type"] = "pen"
         self.parent().parent().active["item"] = QtGui.QPen(self.parent().parent().active["color"] if self.parent().parent().active["color"] else Qt.GlobalColor.black, self.parent().parent().active["size"])
     
-        self.parent().parent().setCustomCursor(QtGui.QCursor(QtGui.QPixmap("C:/GitHub/Paint/assets/pen.png")))
+        self.parent().parent().setCustomCursor(QtGui.QCursor(QtGui.QPixmap("./assets/pen.png")))

@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QToolButton, QMenu, QPushButton, QVBoxLayout, QHBoxL
 
 class Fill_Bucket(QToolButton):
     def __init__(self, parent):
-        super().__init__(icon=QIcon("C:/GitHub/Paint/assets/fill_bucket.png"), parent=parent)
+        super().__init__(icon=QIcon("./assets/fill_bucket.png"), parent=parent)
 
         self.setStatusTip("Fill Bucket")
         self.setCheckable(True)
@@ -20,4 +20,4 @@ class Fill_Bucket(QToolButton):
         self.parent().parent().active["type"] = "fill_bucket"
         self.parent().parent().active["item"] = QtGui.QPen(self.parent().parent().active["color"] if self.parent().parent().active["color"] else Qt.GlobalColor.black, 1)
 
-        self.parent().parent().setCustomCursor(QtGui.QCursor(QtGui.QPixmap("C:/GitHub/Paint/assets/fill_bucket.png")))
+        self.parent().parent().setCustomCursor(QtGui.QCursor(QtGui.QPixmap("./assets/fill_bucket.png")))

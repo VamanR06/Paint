@@ -1,5 +1,4 @@
 from PyQt6 import QtGui, QtWidgets
-from ..windows.main_window import MainWindow
 
 class System_Tray(QtWidgets.QSystemTrayIcon):
     def __init__(self, app: QtWidgets.QApplication):
@@ -7,7 +6,7 @@ class System_Tray(QtWidgets.QSystemTrayIcon):
 
         self.app = app
 
-        self.setIcon(QtGui.QIcon("C:/GitHub/Paint/assets/icon.png"))
+        self.setIcon(QtGui.QIcon("./assets/icon.png"))
         self.setVisible(True)
 
         tray_menu = QtWidgets.QMenu()

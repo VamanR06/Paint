@@ -1,7 +1,7 @@
-from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtGui import QIcon
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QToolButton, QMenu, QPushButton, QVBoxLayout, QHBoxLayout
+from PyQt6.QtWidgets import QToolButton
 
 class Fill_Bucket(QToolButton):
     def __init__(self, parent):

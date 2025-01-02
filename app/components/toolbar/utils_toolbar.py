@@ -1,6 +1,4 @@
-from PyQt6 import QtGui
-from PyQt6.QtWidgets import QToolBar, QStatusBar, QWidget
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QToolBar, QWidget
 from ..buttons import Pen, Eraser, Fill_Bucket
 
 class Utils_ToolBar(QToolBar):

@@ -1,5 +1,5 @@
 from PyQt6 import QtGui
-from PyQt6.QtWidgets import QLabel, QToolBar, QStatusBar, QMainWindow, QSizePolicy, QFileDialog, QWidget, QMessageBox
+from PyQt6.QtWidgets import QMainWindow, QFileDialog, QWidget, QMessageBox
 from PyQt6.QtCore import Qt
 from ..toolbar import Main_ToolBar, Utils_ToolBar, Color_ToolBar
 
@@ -8,7 +8,6 @@ class MainWindow(QMainWindow):
         super().__init__()
         
         self.setWindowTitle("Paint")
-        self.setWindowIcon(QtGui.QIcon("C:/GitHub/Paint/assets/icon.png"))
 
         self.addToolBar(Main_ToolBar(self))
         self.addToolBarBreak(Qt.ToolBarArea.TopToolBarArea)
@@ -110,7 +109,9 @@ class MainWindow(QMainWindow):
             data = f.read()
 
         self.canvas.image.loadFromData(data)
-        self.canvas.image = self.canvas.image.scaled(self.canvas.width(), self.canvas.height(), Qt.AspectRatioMode.IgnoreAspectRatio)
+        self.canvas.image = self.canvas.image.scaled(self.canvas.size(), Qt.AspectRatioMode.KeepAspectRatio)
+        self.canvas.setMinimumSize(self.canvas.image.width(), self.canvas.image.height())
+        self.resize(self.canvas.image.width(), self.canvas.image.height())
         self.canvas.update()
 
         self.filePath = filePath

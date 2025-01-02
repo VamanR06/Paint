@@ -1,5 +1,4 @@
-from PyQt6.QtWidgets import QToolBar, QStatusBar
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QToolBar
 from ..buttons import File, Edit
 
 class Main_ToolBar(QToolBar):

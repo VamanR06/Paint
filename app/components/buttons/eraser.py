@@ -1,7 +1,7 @@
-from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtGui import QIcon
 from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QToolButton, QMenu, QPushButton, QVBoxLayout, QHBoxLayout
+from PyQt6.QtWidgets import QToolButton
 
 class Eraser(QToolButton):
     def __init__(self, parent):
@@ -20,4 +20,4 @@ class Eraser(QToolButton):
         self.parent().parent().active["type"] = "eraser"
         self.parent().parent().active["item"] = QtGui.QPen(Qt.GlobalColor.white, self.parent().parent().active["size"])
 
-        self.parent().parent().setCustomCursor(QtGui.QCursor(QtGui.QPixmap("C:/GitHub/Paint/assets/eraser.png")))
+        self.parent().parent().setCustomCursor(QtGui.QCursor(QtGui.QPixmap("./assets/eraser.png")))
